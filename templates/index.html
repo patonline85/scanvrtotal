@@ -3,51 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VT Scanner (Docker)</title>
+    <title>VT Scanner | Pháp Môn Tâm Linh</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 p-4 font-sans flex items-center justify-center min-h-screen">
-    <div class="max-w-md w-full bg-white rounded-xl shadow-md overflow-hidden p-6">
-        <h1 class="text-2xl font-bold text-center text-blue-600 mb-6">🛡️ Trình Quét VirusTotal</h1>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        paper: '#F9F7F2',
+                        ink: '#5D2E2E',
+                        clay: '#8C4A4A',
+                        clayHover: '#7A3E3E',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    boxShadow: {
+                        'paper': '0 4px 20px -2px rgba(93, 46, 46, 0.1)',
+                        'float': '0 10px 30px -5px rgba(140, 74, 74, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F9F7F2; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8C4A4A; 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7A3E3E; 
+        }
         
-        <div id="selection-area">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Chọn hoặc kéo thả tệp cần quét:</label>
-            <input type="file" id="fileInput" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4 border p-2 rounded-lg cursor-pointer">
+        /* Ẩn input file mặc định và custom lại nút */
+        input[type="file"]::file-selector-button {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-paper text-ink font-sans min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-7xl mx-auto w-full flex justify-center">
+        
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-paper overflow-hidden p-8 transition-all duration-300">
             
-            <button onclick="startScan()" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow transition duration-200">
-                🚀 Tải lên & Quét
-            </button>
-        </div>
-
-        <div id="loading-area" class="hidden text-center py-6">
-            <div class="animate-spin inline-block w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full mb-4"></div>
-            <h2 class="text-xl font-semibold text-gray-800">Đang phân tích tệp...</h2>
-            <p id="countdown" class="text-red-500 font-bold text-3xl mt-2">60</p>
-            <p class="text-sm text-gray-500 mt-2">Vui lòng không đóng trang web</p>
-        </div>
-
-        <div id="result-area" class="hidden mt-6">
-            <h2 class="text-xl font-bold text-center mb-4 border-b pb-2">Báo Cáo Chi Tiết</h2>
-            <div class="grid grid-cols-3 gap-4 text-center mb-6">
-                <div class="bg-red-100 p-3 rounded-lg border border-red-300">
-                    <p class="text-sm text-red-600 font-semibold">Độc hại</p>
-                    <p id="res-mal" class="text-2xl font-bold text-red-600">0</p>
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-paper rounded-full mb-3 text-clay">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
                 </div>
-                <div class="bg-yellow-100 p-3 rounded-lg border border-yellow-300">
-                    <p class="text-sm text-yellow-600 font-semibold">Nghi ngờ</p>
-                    <p id="res-sus" class="text-2xl font-bold text-yellow-600">0</p>
+                <h1 class="text-2xl font-semibold text-ink">Bảo Mật Tệp Tin</h1>
+                <p class="text-sm text-ink/70 mt-1">Quét và phân tích an toàn dữ liệu</p>
+            </div>
+            
+            <div id="selection-area" class="transition-all duration-300">
+                <label class="block text-sm font-medium text-ink mb-3"><i class="fa-solid fa-cloud-arrow-up mr-2"></i>Chọn hoặc kéo thả tệp:</label>
+                
+                <div class="relative mb-6">
+                    <input type="file" id="fileInput" 
+                           class="block w-full text-sm text-ink/70 bg-paper rounded-xl border-2 border-dashed border-clay/30 p-2 cursor-pointer hover:border-clay transition-all duration-300
+                           file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white file:text-clay file:shadow-sm hover:file:bg-clay hover:file:text-white">
                 </div>
-                <div class="bg-green-100 p-3 rounded-lg border border-green-300">
-                    <p class="text-sm text-green-600 font-semibold">An toàn</p>
-                    <p id="res-und" class="text-2xl font-bold text-green-600">0</p>
+                
+                <button onclick="startScan()" class="w-full bg-clay text-white font-medium py-3 px-4 rounded-2xl shadow-float hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass"></i> Phân Tích Ngay
+                </button>
+            </div>
+
+            <div id="loading-area" class="hidden text-center py-6 transition-all duration-300">
+                <div class="relative w-16 h-16 mx-auto mb-6">
+                    <div class="absolute inset-0 rounded-full border-4 border-paper"></div>
+                    <div class="absolute inset-0 rounded-full border-4 border-clay border-t-transparent animate-spin"></div>
+                    <div class="absolute inset-0 flex items-center justify-center text-clay">
+                        <i class="fa-solid fa-microchip text-sm"></i>
+                    </div>
+                </div>
+                
+                <h2 class="text-lg font-medium text-ink mb-1">Đang tiến hành phân tích...</h2>
+                <p class="text-sm text-ink/60 mb-4">Vui lòng không đóng trình duyệt</p>
+                
+                <div class="bg-paper rounded-xl py-3 px-4 inline-block border border-clay/10">
+                    <span class="text-sm text-ink/70 mr-2">Thời gian còn lại:</span>
+                    <span id="countdown" class="font-mono text-clay font-bold text-2xl">60</span><span class="font-mono text-clay text-sm">s</span>
                 </div>
             </div>
-            <a id="vt-link" href="#" target="_blank" class="block w-full text-center bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded-lg">
-                🌐 Xem chi tiết trên Web
-            </a>
-            <button onclick="location.reload()" class="w-full mt-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg">
-                Quét tệp khác
-            </button>
+
+            <div id="result-area" class="hidden mt-2 transition-all duration-300">
+                <h2 class="text-lg font-semibold text-center mb-5 text-ink flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-clipboard-check text-clay"></i> Báo Cáo Chi Tiết
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+                    <div class="bg-paper p-4 rounded-2xl border border-clay/20 flex flex-col items-center justify-center">
+                        <i class="fa-solid fa-bug text-clay mb-2"></i>
+                        <p class="text-xs text-ink/80 font-medium uppercase tracking-wider mb-1">Độc hại</p>
+                        <p id="res-mal" class="font-mono text-2xl font-bold text-clay">0</p>
+                    </div>
+                    <div class="bg-paper p-4 rounded-2xl border border-ink/20 flex flex-col items-center justify-center">
+                        <i class="fa-solid fa-triangle-exclamation text-ink/70 mb-2"></i>
+                        <p class="text-xs text-ink/80 font-medium uppercase tracking-wider mb-1">Nghi ngờ</p>
+                        <p id="res-sus" class="font-mono text-2xl font-bold text-ink">0</p>
+                    </div>
+                    <div class="bg-paper p-4 rounded-2xl border border-green-800/20 flex flex-col items-center justify-center">
+                        <i class="fa-solid fa-shield-check text-green-800/70 mb-2"></i>
+                        <p class="text-xs text-ink/80 font-medium uppercase tracking-wider mb-1">An toàn</p>
+                        <p id="res-und" class="font-mono text-2xl font-bold text-green-800">0</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    <a id="vt-link" href="#" target="_blank" class="w-full bg-ink text-paper font-medium py-3 px-4 rounded-2xl shadow-md hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-globe"></i> Xem trên VirusTotal
+                    </a>
+                    <button onclick="location.reload()" class="w-full bg-paper text-ink border border-ink/10 font-medium py-3 px-4 rounded-2xl hover:bg-white hover:shadow-sm hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Quét Tệp Khác
+                    </button>
+                </div>
+            </div>
+            
         </div>
     </div>
 
@@ -69,6 +155,7 @@
             formData.append('file', file);
 
             try {
+                // Giả lập API fetch cho UI demo nếu không có backend thực tế
                 const res = await fetch('/scan', { method: 'POST', body: formData });
                 const data = await res.json();
                 
@@ -110,7 +197,7 @@
                 }, 60000);
 
             } catch (err) {
-                alert("Đã xảy ra lỗi mạng hoặc hệ thống!");
+                alert("Đã xảy ra lỗi mạng hoặc hệ thống! (Nếu bạn đang chạy local không có Backend, lỗi này là bình thường)");
                 location.reload();
             }
         }
