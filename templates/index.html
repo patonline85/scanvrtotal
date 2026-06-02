@@ -34,25 +34,13 @@
 
     <style>
         /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #F9F7F2; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #8C4A4A; 
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #7A3E3E; 
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #F9F7F2; }
+        ::-webkit-scrollbar-thumb { background: #8C4A4A; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #7A3E3E; }
         
         /* Ẩn input file mặc định và custom lại nút */
-        input[type="file"]::file-selector-button {
-            transition: all 0.3s ease;
-        }
+        input[type="file"]::file-selector-button { transition: all 0.3s ease; }
     </style>
 </head>
 <body class="bg-paper text-ink font-sans min-h-screen flex items-center justify-center p-4">
@@ -61,26 +49,47 @@
         
         <div class="w-full max-w-md bg-white rounded-3xl shadow-paper overflow-hidden p-8 transition-all duration-300">
             
-        <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-12 h-12 bg-paper rounded-full mb-3 text-clay overflow-hidden">
-                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="w-full h-full object-contain">
-            </div>
-            <h1 class="text-2xl font-semibold text-ink">Quét Virus Trực Tuyến</h1>
-            <p class="text-sm text-ink/70 mt-1">Quét và phân tích an toàn dữ liệu</p>
-        </div>
-            
-            <div id="selection-area" class="transition-all duration-300">
-                <label class="block text-sm font-medium text-ink mb-3"><i class="fa-solid fa-cloud-arrow-up mr-2"></i>Chọn hoặc kéo thả tệp:</label>
-                
-                <div class="relative mb-6">
-                    <input type="file" id="fileInput" 
-                           class="block w-full text-sm text-ink/70 bg-paper rounded-xl border-2 border-dashed border-clay/30 p-2 cursor-pointer hover:border-clay transition-all duration-300
-                           file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white file:text-clay file:shadow-sm hover:file:bg-clay hover:file:text-white">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-paper rounded-full mb-3 text-clay overflow-hidden">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="w-full h-full object-contain">
                 </div>
+                <h1 class="text-2xl font-semibold text-ink">Quét Virus Trực Tuyến</h1>
+                <p class="text-sm text-ink/70 mt-1">Phân tích tệp tin và đường liên kết (URL)</p>
+            </div>
+
+            <div id="input-area" class="transition-all duration-300">
                 
-                <button onclick="startScan()" class="w-full bg-clay text-white font-medium py-3 px-4 rounded-2xl shadow-float hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-magnifying-glass"></i> Phân Tích Ngay
-                </button>
+                <div class="flex border-b border-clay/20 mb-6">
+                    <button id="tab-file-btn" onclick="switchTab('file')" class="flex-1 py-2 text-sm font-semibold border-b-2 border-clay text-clay transition-all duration-300">
+                        <i class="fa-solid fa-file-shield mr-2"></i>Quét Tệp
+                    </button>
+                    <button id="tab-url-btn" onclick="switchTab('url')" class="flex-1 py-2 text-sm font-semibold border-b-2 border-transparent text-ink/50 hover:text-ink transition-all duration-300">
+                        <i class="fa-solid fa-link mr-2"></i>Quét Link
+                    </button>
+                </div>
+
+                <div id="tab-file-content" class="block">
+                    <label class="block text-sm font-medium text-ink mb-3"><i class="fa-solid fa-cloud-arrow-up mr-2"></i>Chọn tệp từ thiết bị:</label>
+                    <div class="relative mb-6">
+                        <input type="file" id="fileInput" 
+                               class="block w-full text-sm text-ink/70 bg-paper rounded-xl border-2 border-dashed border-clay/30 p-2 cursor-pointer hover:border-clay transition-all duration-300
+                               file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white file:text-clay file:shadow-sm hover:file:bg-clay hover:file:text-white">
+                    </div>
+                    <button onclick="startFileScan()" class="w-full bg-clay text-white font-medium py-3 px-4 rounded-2xl shadow-float hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass"></i> Phân Tích Tệp Ngay
+                    </button>
+                </div>
+
+                <div id="tab-url-content" class="hidden">
+                    <label class="block text-sm font-medium text-ink mb-3"><i class="fa-solid fa-globe mr-2"></i>Nhập đường liên kết (URL):</label>
+                    <div class="relative mb-6">
+                        <input type="url" id="urlInput" placeholder="Ví dụ: https://trang-web-nghi-ngo.com" 
+                               class="block w-full text-sm text-ink bg-paper rounded-xl border border-clay/30 p-4 outline-none focus:border-clay focus:ring-1 focus:ring-clay transition-all duration-300">
+                    </div>
+                    <button onclick="startUrlScan()" class="w-full bg-clay text-white font-medium py-3 px-4 rounded-2xl shadow-float hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass"></i> Phân Tích Link Ngay
+                    </button>
+                </div>
             </div>
 
             <div id="loading-area" class="hidden text-center py-6 transition-all duration-300">
@@ -129,7 +138,7 @@
                         <i class="fa-solid fa-globe"></i> Xem trên VirusTotal
                     </a>
                     <button onclick="location.reload()" class="w-full bg-paper text-ink border border-ink/10 font-medium py-3 px-4 rounded-2xl hover:bg-white hover:shadow-sm hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-rotate-right"></i> Quét Tệp Khác
+                        <i class="fa-solid fa-rotate-right"></i> Quét Lại
                     </button>
                 </div>
             </div>
@@ -138,24 +147,57 @@
     </div>
 
     <script>
-        async function startScan() {
+        // Hàm chuyển đổi giao diện Tab (Tệp / URL)
+        function switchTab(tabName) {
+            const fileBtn = document.getElementById('tab-file-btn');
+            const urlBtn = document.getElementById('tab-url-btn');
+            const fileContent = document.getElementById('tab-file-content');
+            const urlContent = document.getElementById('tab-url-content');
+
+            if (tabName === 'file') {
+                fileBtn.className = "flex-1 py-2 text-sm font-semibold border-b-2 border-clay text-clay transition-all duration-300";
+                urlBtn.className = "flex-1 py-2 text-sm font-semibold border-b-2 border-transparent text-ink/50 hover:text-ink transition-all duration-300";
+                fileContent.classList.remove('hidden');
+                urlContent.classList.add('hidden');
+            } else {
+                urlBtn.className = "flex-1 py-2 text-sm font-semibold border-b-2 border-clay text-clay transition-all duration-300";
+                fileBtn.className = "flex-1 py-2 text-sm font-semibold border-b-2 border-transparent text-ink/50 hover:text-ink transition-all duration-300";
+                urlContent.classList.remove('hidden');
+                fileContent.classList.add('hidden');
+            }
+        }
+
+        // Logic đếm ngược chung
+        let timer;
+        function startCountdown(seconds) {
+            let timeLeft = seconds;
+            const countdownEl = document.getElementById('countdown');
+            countdownEl.innerText = timeLeft;
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                countdownEl.innerText = timeLeft;
+                if (timeLeft <= 0) clearInterval(timer);
+            }, 1000);
+        }
+
+        // 1. Hàm quét Tệp (Đã có sẵn, tinh chỉnh một chút)
+        async function startFileScan() {
             const fileInput = document.getElementById('fileInput');
             if (fileInput.files.length === 0) return alert("Vui lòng chọn một tệp để quét!");
             const file = fileInput.files[0];
 
-            // Cảnh báo dung lượng (>32MB)
             if (file.size > 32 * 1024 * 1024) {
                 if(!confirm("Tệp lớn hơn 32MB có thể bị API miễn phí từ chối. Bạn vẫn muốn tiếp tục?")) return;
             }
 
-            document.getElementById('selection-area').classList.add('hidden');
+            document.getElementById('input-area').classList.add('hidden');
             document.getElementById('loading-area').classList.remove('hidden');
 
             const formData = new FormData();
             formData.append('file', file);
 
             try {
-                // Giả lập API fetch cho UI demo nếu không có backend thực tế
                 const res = await fetch('/scan', { method: 'POST', body: formData });
                 const data = await res.json();
                 
@@ -166,14 +208,7 @@
                 }
 
                 document.getElementById('vt-link').href = `https://www.virustotal.com/gui/file/${data.hash}`;
-
-                let timeLeft = 60;
-                const countdownEl = document.getElementById('countdown');
-                const timer = setInterval(() => {
-                    timeLeft--;
-                    countdownEl.innerText = timeLeft;
-                    if (timeLeft <= 0) clearInterval(timer);
-                }, 1000);
+                startCountdown(60);
 
                 setTimeout(async () => {
                     const formReport = new FormData();
@@ -197,7 +232,68 @@
                 }, 60000);
 
             } catch (err) {
-                alert("Đã xảy ra lỗi mạng hoặc hệ thống! (Nếu bạn đang chạy local không có Backend, lỗi này là bình thường)");
+                alert("Đã xảy ra lỗi hệ thống! (Chưa kết nối Backend)");
+                location.reload();
+            }
+        }
+
+        // 2. Hàm mới: Quét URL
+        async function startUrlScan() {
+            const urlInput = document.getElementById('urlInput').value.trim();
+            if (!urlInput) return alert("Vui lòng nhập đường liên kết (URL) cần quét!");
+            
+            // Validate định dạng URL sơ bộ
+            if (!urlInput.startsWith('http://') && !urlInput.startsWith('https://')) {
+                return alert("URL phải bắt đầu bằng http:// hoặc https://");
+            }
+
+            document.getElementById('input-area').classList.add('hidden');
+            document.getElementById('loading-area').classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append('url', urlInput);
+
+            try {
+                // Gọi tới endpoint mới dành riêng cho URL (Bạn cần viết thêm trong app.py)
+                const res = await fetch('/scan-url', { method: 'POST', body: formData });
+                const data = await res.json();
+                
+                if (data.error) {
+                    alert("Lỗi: " + data.error);
+                    location.reload();
+                    return;
+                }
+
+                // Link báo cáo URL trên VirusTotal thường có định dạng khác file
+                document.getElementById('vt-link').href = `https://www.virustotal.com/gui/url/${data.url_id}`;
+                
+                // Việc quét URL thường mất ít thời gian hơn file, để 20s - 30s là đủ
+                startCountdown(20);
+
+                setTimeout(async () => {
+                    const formReport = new FormData();
+                    formReport.append('analysis_id', data.analysis_id);
+                    
+                    // Gọi endpoint lấy báo cáo URL
+                    const repRes = await fetch('/report-url', { method: 'POST', body: formReport });
+                    const repData = await repRes.json();
+                    
+                    document.getElementById('loading-area').classList.add('hidden');
+                    document.getElementById('result-area').classList.remove('hidden');
+
+                    if(repData.error) {
+                        alert("Lỗi khi lấy báo cáo URL: " + repData.error);
+                        return;
+                    }
+
+                    document.getElementById('res-mal').innerText = repData.malicious || 0;
+                    document.getElementById('res-sus').innerText = repData.suspicious || 0;
+                    document.getElementById('res-und').innerText = repData.undetected || 0;
+
+                }, 20000);
+
+            } catch (err) {
+                alert("Đã xảy ra lỗi hệ thống khi quét URL!");
                 location.reload();
             }
         }
