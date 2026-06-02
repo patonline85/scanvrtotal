@@ -237,14 +237,17 @@
             }
         }
 
-        // 2. Hàm mới: Quét URL
         async function startUrlScan() {
-            const urlInput = document.getElementById('urlInput').value.trim();
+            // Đổi const thành let để có thể chỉnh sửa lại giá trị urlInput
+            let urlInput = document.getElementById('urlInput').value.trim();
             if (!urlInput) return alert("Vui lòng nhập đường liên kết (URL) cần quét!");
             
-            // Validate định dạng URL sơ bộ
+            // NÂNG CẤP: Tự động chèn http:// nếu người dùng quên gõ
             if (!urlInput.startsWith('http://') && !urlInput.startsWith('https://')) {
-                return alert("URL phải bắt đầu bằng http:// hoặc https://");
+                urlInput = 'http://' + urlInput;
+                
+                // Tự động cập nhật lại ô nhập liệu trên giao diện để người dùng thấy
+                document.getElementById('urlInput').value = urlInput;
             }
 
             document.getElementById('input-area').classList.add('hidden');
@@ -254,7 +257,7 @@
             formData.append('url', urlInput);
 
             try {
-                // Gọi tới endpoint mới dành riêng cho URL (Bạn cần viết thêm trong app.py)
+                // Gọi tới endpoint API quét URL
                 const res = await fetch('/scan-url', { method: 'POST', body: formData });
                 const data = await res.json();
                 
@@ -264,10 +267,9 @@
                     return;
                 }
 
-                // Link báo cáo URL trên VirusTotal thường có định dạng khác file
+                // Link báo cáo URL trên VirusTotal
                 document.getElementById('vt-link').href = `https://www.virustotal.com/gui/url/${data.url_id}`;
                 
-                // Việc quét URL thường mất ít thời gian hơn file, để 20s - 30s là đủ
                 startCountdown(20);
 
                 setTimeout(async () => {
