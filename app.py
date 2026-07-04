@@ -1,11 +1,25 @@
 import os, hashlib, requests, base64
 from flask import Flask, render_template, request, jsonify
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import RequestEntityTooLarge
 
 app = Flask(__name__)
 # Đọc API Key từ biến môi trường (sẽ truyền qua Portainer)
 VT_API_KEY = os.environ.get('VT_API_KEY')
 
+# ==========================================
+# CẤU HÌNH BẢO MẬT: GIỚI HẠN DUNG LƯỢNG UPLOAD
+# ==========================================
+# Giới hạn toàn bộ request body (bao gồm cả file) ở mức 32 MB
+app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024 
+
+# Bắt lỗi khi người dùng cố tình gửi file > 32MB và trả về định dạng JSON
+@app.errorhandler(RequestEntityTooLarge)
+def handle_file_size_exceeded(error):
+    return jsonify({
+        "error": "Tệp quá lớn. Hệ thống chỉ cho phép tải lên tối đa 32MB để đảm bảo hiệu suất."
+    }), 413
+    
 def get_sha256(file_stream):
     sha256_hash = hashlib.sha256()
     file_stream.seek(0)
