@@ -187,8 +187,12 @@
             if (fileInput.files.length === 0) return alert("Vui lòng chọn một tệp để quét!");
             const file = fileInput.files[0];
 
-            if (file.size > 32 * 1024 * 1024) {
-                if(!confirm("Tệp lớn hơn 32MB có thể bị API miễn phí từ chối. Bạn vẫn muốn tiếp tục?")) return;
+            const maxSize = 32 * 1024 * 1024; // 32MB
+            if (file.size > maxSize) {
+                // Hiển thị thông báo dung lượng thực tế
+                alert(`⛔ Tệp của Sư huynh quá lớn (${(file.size / 1024 / 1024).toFixed(2)}MB).\nHệ thống chỉ cho phép tải lên tối đa 32MB.`);
+                fileInput.value = ""; // Xóa trắng ô nhập liệu để người dùng chọn file khác
+                return; // Dừng hàm ngay lập tức, KHÔNG chạy xuống phần hiển thị loading hay gọi API
             }
 
             document.getElementById('input-area').classList.add('hidden');
