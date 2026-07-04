@@ -66,6 +66,8 @@ def scan():
     except requests.exceptions.HTTPError as errh:
         if response.status_code == 413:
             return jsonify({"error": "Tệp quá lớn. API miễn phí giới hạn 32MB."})
+        elif response.status_code == 429: # THÊM KHỐI LỆNH NÀY
+            return jsonify({"error": "Hệ thống đang quá tải (vượt giới hạn 4 lần quét/phút). Vui lòng đợi 1 phút rồi thử lại."})
         return jsonify({"error": f"Lỗi API: {errh}"})
     except Exception as e:
         return jsonify({"error": str(e)})
@@ -121,7 +123,9 @@ def scan_url():
         
         return jsonify({"status": "success", "analysis_id": analysis_id, "url_id": url_id})
     except requests.exceptions.HTTPError as errh:
-        return jsonify({"error": f"Lỗi API VirusTotal: {errh}"})
+        if response.status_code == 429:
+            return jsonify({"error": "Hệ thống đang quá tải (vượt giới hạn 4 lần lấy báo cáo/phút). Vui lòng đợi 1 phút rồi thử lại."})
+        return jsonify({"error": f"Lỗi API: {errh}"})
     except Exception as e:
         return jsonify({"error": str(e)})
 
